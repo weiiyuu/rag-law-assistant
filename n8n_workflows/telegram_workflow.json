@@ -1,0 +1,160 @@
+{
+  "name": "telegram_workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -736,
+        16
+      ],
+      "id": "948a85d5-52c3-4318-a756-668b31caa6a5",
+      "name": "Telegram Trigger",
+      "webhookId": "d701c2e1-44a9-4880-ae15-26647f000226",
+      "credentials": {
+        "telegramApi": {
+          "id": "qZ6IUr4qOdxnMUiF",
+          "name": "RAG advisor"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -288,
+        16
+      ],
+      "id": "970e05f8-7fac-4e86-91eb-61c1cd009a72",
+      "name": "Send a text message",
+      "webhookId": "2914d0c5-b7ab-4795-9242-e1467e9b0f66",
+      "credentials": {
+        "telegramApi": {
+          "id": "qZ6IUr4qOdxnMUiF",
+          "name": "RAG advisor"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ada5ONQDY5WcrsoL",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ada5ONQDY5WcrsoL",
+          "cachedResultName": "QA_subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chat_id": "={{ $json.message.chat.id }}",
+            "message_format": "telegram",
+            "query": "={{ $json.message.text }}",
+            "other": "=User Display Name: {{ $json.message.chat.first_name }} {{ $json.message.chat.last_name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message_format",
+              "displayName": "message_format",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "other",
+              "displayName": "other",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        16
+      ],
+      "id": "a876b758-7f49-48f2-8b5c-ba403a93f2fb",
+      "name": "Call 'QA_subworkflow'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'QA_subworkflow'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'QA_subworkflow'": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a771a8f5-b8ee-4b24-9464-c45b1b482f43",
+  "meta": {
+    "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
+  },
+  "id": "J8jE0JN4FzHBcm1F",
+  "tags": []
+}

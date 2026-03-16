@@ -1,0 +1,422 @@
+{
+  "name": "social_network",
+  "nodes": [
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "me",
+        "edge": "feed",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.output }}"
+              },
+              {
+                "name": "published",
+                "value": "true"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        592
+      ],
+      "id": "c118c1a8-8634-4466-8f26-80fbdff70c5c",
+      "name": "Facebook 發布文章",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "yqiR51tyB5F4KR9A",
+          "name": "Facebook Graph account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8-20 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        400
+      ],
+      "id": "48632a15-116d-458c-8d68-d133be1d6b55",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.input }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "從資料庫尋找法律條文。\n使用工具取得Facebook貼文，避免重複已發佈內容。\n\n產生可以顯示在Facebook貼文的純文字文章。\n不要用markdown。\n\n使用pollinations.ai產生圖片，請你自己判斷pollinations.ai的限制。儘量不要讓圖片出現文字。prompt限制16個詞。只使用底線分隔。\n格式範例: https://image.pollinations.ai/prompt/your_prompt_here\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        704,
+        400
+      ],
+      "id": "9ed9e74f-1c72-4ba4-a71f-b71812f2eda5",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        624
+      ],
+      "id": "fe53dea5-f0de-4801-bbd7-c847435ea558",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        768,
+        832
+      ],
+      "id": "1919736b-dc39-413d-956e-1575ad2dde0d",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "46a0731e-ed32-4c31-bd10-06eaaa304a15",
+              "name": "input",
+              "value": "=使用輕鬆的語氣，生成一篇可以直接發佈在FB粉絲專業的法律條文冷知識。\n只要產生內容，不要回覆使用者。\n隨機選擇法律條文。\n你應該用facebook工具確認，發佈內容不要重複已發佈的貼文，主題儘量不要連續。\n注意輸出格式是否能在facebook正常顯示。\n每個貼文都有附圖片，prompt要跟內容有關。\n\ncurrent datetime: {{ $now }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        400
+      ],
+      "id": "d37306e4-89b9-4793-aeb5-994aeec43180",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "法律條文資料庫。",
+        "tableName": "n8n_final_project",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        688,
+        624
+      ],
+      "id": "acace944-3564-4306-ad13-a8d32db628d7",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "avu58oQ4srkieP2w",
+          "name": "Local Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "n8n_fb",
+        "contextWindowLength": 60
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        624
+      ],
+      "id": "6840589d-6398-4db6-96f9-df2b258dbfec",
+      "name": "Postgres FB Post Memory",
+      "credentials": {
+        "postgres": {
+          "id": "avu58oQ4srkieP2w",
+          "name": "Local Postgres"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "取得facebook已發布的貼文",
+        "graphApiVersion": "v23.0",
+        "node": "me",
+        "edge": "posts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.facebookGraphApiTool",
+      "typeVersion": 1,
+      "position": [
+        976,
+        624
+      ],
+      "id": "f4ad6a4c-2bd2-4fc3-9ba3-27e887f137a9",
+      "name": "Facebook 取得貼文",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "yqiR51tyB5F4KR9A",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v23.0",
+        "node": "me",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "message",
+                "value": "={{ $json.output.output_post }}"
+              },
+              {
+                "name": "published",
+                "value": "true"
+              },
+              {
+                "name": "url",
+                "value": "={{ $json.output.image_path }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        400
+      ],
+      "id": "51f21935-a05d-449a-b19c-44b55e68677d",
+      "name": "Facebook 發布圖片文章",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "yqiR51tyB5F4KR9A",
+          "name": "Facebook Graph account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 不重覆貼文內容",
+        "height": 80,
+        "width": 224
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        720
+      ],
+      "typeVersion": 1,
+      "id": "44f4dc68-298b-4448-8046-75a6b9726e23",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"output_post\": {\n\t\t\t\"type\": \"string\"\n\t\t},\n\t\t\"image_path\": {\n\t\t\t\"type\": \"string\"\n\t\t}\n\t}\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        624
+      ],
+      "id": "a1b5b8ab-07aa-40f9-9579-342054294f13",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.output.image_path }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1312,
+        208
+      ],
+      "id": "ec7a503b-b57e-4b69-8ef1-71e07781ef1d",
+      "name": "Image Prefetch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Facebook 發布文章": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Facebook 發布文章",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Image Prefetch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Facebook 發布圖片文章",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres FB Post Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook 取得貼文": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Prefetch": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5dfdaabc-9210-45ee-bdf6-8cbda6d8ca66",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
+  },
+  "id": "TORRUXme7qlreKFP",
+  "tags": []
+}

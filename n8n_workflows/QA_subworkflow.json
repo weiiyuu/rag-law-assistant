@@ -1,0 +1,313 @@
+{
+  "name": "QA_subworkflow",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            },
+            {
+              "name": "message_format"
+            },
+            {
+              "name": "chat_id"
+            },
+            {
+              "name": "other",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -448,
+        368
+      ],
+      "id": "aa34aea2-9a53-45eb-8c02-85ce36d3fcf4",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        128,
+        176
+      ],
+      "id": "f4088268-1005-43b5-8603-3fb0fd72539f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        464,
+        384
+      ],
+      "id": "35f821eb-01be-4b84-a4bc-1aa39a0042b2",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('When Executed by Another Workflow').item.json.query }}",
+        "options": {
+          "systemMessage": "=使用台灣繁體中文回答問題。\n回覆長度不超過100字。\n需列出法條名稱、條文標號與原文。\n\n如果是法律諮詢，則組織使用者邏輯，並提供法律條文建議。\n尋找相關近似條文，如果資料庫找不到條文，回覆法條關鍵字供使用者搜尋網路。\n\n回覆格式(依照輸出平台微調)：\n{回覆內容}\n法律關鍵字: {}\n法律條文:\n1. <xxx> xxx\n\nmessage output format: {{ $json.message_format }}\ncurrent datetime: {{ new Date() }}。\nother information: {{ $json.other }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        192,
+        -48
+      ],
+      "id": "43dab88b-7649-4607-9d55-0c67d15d7955",
+      "name": "Chat Agent"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "法律條文的資料庫。",
+        "tableName": "n8n_final_project",
+        "topK": 6,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        176
+      ],
+      "id": "6adefa6f-2f10-4aa7-b2d1-9ad8dbf53591",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "avu58oQ4srkieP2w",
+          "name": "Local Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('When Executed by Another Workflow').item.json.chat_id }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        176
+      ],
+      "id": "69f95e5f-1c52-4574-865e-5ab98fc2a765",
+      "name": "Chat Memory"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.query }}",
+        "guardrails": {
+          "topicalAlignment": {
+            "value": {
+              "threshold": 0.7,
+              "prompt": "You are a content analysis system that determines if text stays on topic.\n\nBUSINESS SCOPE: 法律條文相關問題\n\nDetermine if the text stays within the defined business scope. Flag any content\nthat strays from the allowed topics."
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        368
+      ],
+      "id": "cb64dabe-f459-4fe8-bdba-a2b96dfec1be",
+      "name": "Guardrails"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        592
+      ],
+      "id": "3cc95b10-4fbf-4078-8c62-511b9f1ecce4",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "41c3235e-e0d2-41f6-985e-db4768bdd2ed",
+              "name": "output",
+              "value": "抱歉，我無法處理這個問題。",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        560
+      ],
+      "id": "5ac19e74-a01b-49b6-a2c2-d47e75c53a7c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "搜尋工具，連接現實\n需要做篩選"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -112
+      ],
+      "id": "33c691e9-e629-4cdb-91b4-ef5873be6bd5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# 法律條文資料庫\n",
+        "width": 304
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "aee74ecc-6f2d-4c9b-9757-e9593194a74f",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Chat Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Chat Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrails": {
+      "main": [
+        [
+          {
+            "node": "Chat Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Guardrails",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ccf517f0-e45a-4e9b-93b2-dae788efd324",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
+  },
+  "id": "ada5ONQDY5WcrsoL",
+  "tags": []
+}

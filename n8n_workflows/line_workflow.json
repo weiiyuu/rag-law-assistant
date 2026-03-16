@@ -1,0 +1,161 @@
+{
+  "name": "line_workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "message"
+        ]
+      },
+      "type": "@aotoki/n8n-nodes-line-messaging.lineMessagingTrigger",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        16
+      ],
+      "id": "0f4d062a-81df-40fd-b6d7-27d7697670d9",
+      "name": "Line Messaging Trigger",
+      "webhookId": "7cfdca0d-85ed-40cb-be3a-9d5dbc5c749a",
+      "credentials": {
+        "lineMessagingApi": {
+          "id": "vaac4gUdXkrfcEq8",
+          "name": "Line Messaging (Assistant)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "replyToken": "={{ $('Line Messaging Trigger').item.json.replyToken }}",
+        "messages": {
+          "values": [
+            {
+              "text": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "@aotoki/n8n-nodes-line-messaging.lineMessaging",
+      "typeVersion": 1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "367172bc-a91c-4c96-b251-7dd7c85a3cc7",
+      "name": "Line Messaging",
+      "credentials": {
+        "lineMessagingApi": {
+          "id": "vaac4gUdXkrfcEq8",
+          "name": "Line Messaging (Assistant)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ada5ONQDY5WcrsoL",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ada5ONQDY5WcrsoL",
+          "cachedResultName": "QA_subworkflow"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "query": "={{ $json.message.text }}",
+            "message_format": "Line",
+            "chat_id": "={{ $json.message.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "query",
+              "displayName": "query",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "message_format",
+              "displayName": "message_format",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "chat_id",
+              "displayName": "chat_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "other",
+              "displayName": "other",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": true,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        16
+      ],
+      "id": "afabb12a-e7ec-401e-a3b9-82f9e00d072c",
+      "name": "Call 'QA_subworkflow'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Line Messaging Trigger": {
+      "main": [
+        [
+          {
+            "node": "Call 'QA_subworkflow'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'QA_subworkflow'": {
+      "main": [
+        [
+          {
+            "node": "Line Messaging",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5a51664a-f755-4df7-a261-1c79a98aaccd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
+  },
+  "id": "0LWfR1m3DQoyKAPO",
+  "tags": []
+}

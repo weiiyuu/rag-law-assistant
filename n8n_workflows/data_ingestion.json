@@ -1,0 +1,366 @@
+{
+  "name": "data_ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {
+          "splitPages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1040,
+        208
+      ],
+      "id": "0aa02d36-5801-4c5b-b07f-df4d4e4ee05a",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "formTitle": "Upload files",
+        "formDescription": "Upload your files here.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "PDF Files",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        32
+      ],
+      "id": "f1be17b4-a5f1-4c49-8a9f-99c8a8ecddff",
+      "name": "On form submission",
+      "webhookId": "6ccc628c-2f42-4521-97db-8229b4db2e2e"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        912,
+        208
+      ],
+      "id": "782dd617-35da-4c3f-9111-86cd760730a3",
+      "name": "Embeddings Google Gemini for Insertion",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Juh5ajJu60eCrkC",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -272
+      ],
+      "id": "1f8c3ca7-4cc7-42b5-8c39-10870d50b136",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "n8n_final_project",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        -32
+      ],
+      "id": "4e1d3975-528b-4405-a285-3230820bf61c",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "avu58oQ4srkieP2w",
+          "name": "Local Postgres"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1lPmIVxwNwBeGaZGAq_9e5vK-Peh3Natl",
+            "mode": "list",
+            "cachedResultName": "AI_show_n8n_project",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1lPmIVxwNwBeGaZGAq_9e5vK-Peh3Natl"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        0,
+        -272
+      ],
+      "id": "9c287e05-c002-4ee7-a847-abdcdcdcdd99",
+      "name": "Get folder category",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vYDTbsIruJXQNm6e",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        -272
+      ],
+      "id": "69194f8b-204f-45a5-b043-db81aea125ef",
+      "name": "Get pdf files",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vYDTbsIruJXQNm6e",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42c55510-7ef4-4dd8-a615-5198050e6cc7",
+              "name": "id",
+              "value": "={{ $('Download file').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "27e944dd-be47-4f16-81ce-040769bea472",
+              "name": "name",
+              "value": "={{ $('Download file').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "329978dc-5bc7-4a9b-ab7b-a63f0d92bb62",
+              "name": "category_name",
+              "value": "={{ $('Get folder category').item.json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "87ee86dc-b3e6-442d-af40-c4f10e5c3b8c",
+              "name": "binary",
+              "value": "={{ $('Download file').item.binary.data }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        -272
+      ],
+      "id": "dcd64619-cc12-43ed-9585-60bd2d19df1f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        -272
+      ],
+      "id": "946fc5e3-6b0a-4e8d-9e65-1ba46b7a49fe",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vYDTbsIruJXQNm6e",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteTable",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list",
+          "cachedResultName": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "n8n_final_project",
+          "mode": "list",
+          "cachedResultName": "n8n_final_project"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        960,
+        -320
+      ],
+      "id": "23f3f695-3187-4280-b9bc-f6b1e165d719",
+      "name": "Delete table or rows",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "avu58oQ4srkieP2w",
+          "name": "Local Postgres"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini for Insertion": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get folder category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get folder category": {
+      "main": [
+        [
+          {
+            "node": "Get pdf files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get pdf files": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Delete table or rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete table or rows": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "36e54946-37f6-4aea-97c4-e3476e7ab1a5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
+  },
+  "id": "nTqoEbttBPd8Nfw8",
+  "tags": []
+}

@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    restart: unless-stopped
+    shm_size: 128mb
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - db_storage:/var/lib/postgresql/18/docker
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Taipei
+      - GENERIC_TIMEZONE=Asia/Taipei
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_SECURE_COOKIE=true
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=postgres
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_SCHEMA=public
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      # - WEBHOOK_URL=${WEBHOOK_URL}  
+    volumes:
+      - n8n_storage:/home/node/.n8n
+
+  # adminer:
+  #   image: adminer:latest
+  #   ports:
+  #     - "8080:8080"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
+
+volumes:
+  n8n_storage:
+  db_storage:
+
+
