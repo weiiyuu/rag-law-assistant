@@ -50,7 +50,9 @@
       }
     },
     {
-      "parameters": {},
+      "parameters": {
+        "modelName": "models/gemini-embedding-2-preview"
+      },
       "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
       "typeVersion": 1,
       "position": [
@@ -144,6 +146,7 @@
     },
     {
       "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite-preview",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
@@ -183,33 +186,6 @@
       ],
       "id": "5ac19e74-a01b-49b6-a2c2-d47e75c53a7c",
       "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "content": "搜尋工具，連接現實\n需要做篩選"
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        96,
-        -112
-      ],
-      "id": "33c691e9-e629-4cdb-91b4-ef5873be6bd5",
-      "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "content": "# 法律條文資料庫\n",
-        "width": 304
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        512,
-        96
-      ],
-      "typeVersion": 1,
-      "id": "aee74ecc-6f2d-4c9b-9757-e9593194a74f",
-      "name": "Sticky Note1"
     }
   ],
   "pinData": {},
@@ -303,7 +279,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ccf517f0-e45a-4e9b-93b2-dae788efd324",
+  "versionId": "7c65ab2d-00c9-4b17-838e-b4efb91aa44d",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "3c2d9e2a9d8b14c1710ff3391a97804e4ff493fe7e8237a22fc742dd46d627ce"
