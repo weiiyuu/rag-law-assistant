@@ -1,12 +1,14 @@
 # 基於 RAG 之法律條文諮詢助手
 
+以 n8n 為核心之法律 RAG Workflow 系統，整合 PostgreSQL/pgvector、Gemini API 與多平台聊天機器人問答流程。
+
 整合 n8n Workflow、PostgreSQL/pgvector 與 Gemini API，建立支援多平台問答與法律知識自動化之 RAG（Retrieval-Augmented Generation）法律諮詢系統。
 
 ---
 
-# 專案目標
+# Project Goal
 
-本專案旨在建立一套輕量化法律條文檢索與生成式問答系統，透過 RAG（Retrieval-Augmented Generation）架構，降低大型語言模型於法律問答中的 hallucination（幻覺）問題。
+本專案旨在建立一套輕量化法律條文檢索與生成式問答系統，透過 RAG（Retrieval-Augmented Generation）架構，提供具檢索依據之法律問答流程。
 
 系統整合：
 
@@ -21,22 +23,22 @@
 - 提升法律條文查詢效率
 - 建立可重用之 AI Workflow
 - 支援多平台法律問答入口
-- 降低純 LLM 回答錯誤風險
+- 提升法律問答的檢索依據性與回答穩定性
 
 ---
 
-# 系統架構
+# System Architecture
 
 ![System Architecture](./assets/system_architecture.png)
 
 ---
 
-# 檔案架構
+# Project Structure
 
 ```text
 .
 ├── assets
-│   ├── system_architecture.png
+│   └── system_architecture.png
 │
 ├── n8n_workflows
 │   ├── QA_subworkflow.json
@@ -53,13 +55,13 @@
 
 ---
 
-# Workflow 說明
+# Workflow Overview
 
 ## QA_subworkflow
 
 核心 RAG 問答流程。
 
-主要功能：
+Features:
 
 - Guardrails 法律問題範圍限制
 - PGVector Retrieval Tool
@@ -114,7 +116,7 @@ Google Drive PDF
 
 法律知識社群內容自動化流程。
 
-主要功能：
+Features:
 
 - 定時產生法律知識內容
 - 重複內容檢查
@@ -122,7 +124,7 @@ Google Drive PDF
 
 ---
 
-# 使用技術
+# Technologies
 
 - n8n
 - Gemini API
