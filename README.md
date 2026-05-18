@@ -1,8 +1,6 @@
 # 基於 RAG 之法律條文諮詢助手
 
-以 n8n 為核心之法律 RAG Workflow 系統，整合 PostgreSQL/pgvector、Gemini API 與多平台聊天機器人問答流程。
-
-整合 n8n Workflow、PostgreSQL/pgvector 與 Gemini API，建立支援多平台問答與法律知識自動化之 RAG（Retrieval-Augmented Generation）法律諮詢系統。
+以 n8n 為核心之法律 RAG Workflow 系統，整合 PostgreSQL/pgvector、Gemini API 與多平台聊天機器人流程，建立具檢索依據之法律問答與法律知識自動化系統。
 
 ---
 
